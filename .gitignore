@@ -1,0 +1,5 @@
+*
+!.vimrc
+!/.vim/ftplugin/*.vim
+!.tmux.conf
+!.gitignore
