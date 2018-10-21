@@ -7,15 +7,24 @@ filetype off
 filetype plugin indent on
 syntax on
 
+let mapleader=","
+
 set encoding=utf-8
 set nu
+set nowrap
+set showmatch
+set ma
 
 set tabstop=4
 set softtabstop=4
 set shiftwidth=4
-set shiftwidth=4
+set textwidth=79
+set expandtab
 set shiftround
 set autoindent
+
+set foldmethod=indent
+set foldlevel=99
 
 " Make search case insensitive
 set hlsearch
@@ -36,10 +45,10 @@ nmap Q gqap
 " bind Ctrl+<movement> keys to move around the windows, instead of using
 " Ctrl+w + <movement>
 " " Every unnecessary keystroke that can be saved is good for your health :)
-map <c-j> <c-w>j
-map <c-k> <c-w>k
-map <c-l> <c-w>l
-map <c-h> <c-w>h
+"map <c-j> <c-w>j
+"map <c-k> <c-w>k
+"map <c-l> <c-w>l
+"map <c-h> <c-w>h
 
 " easier moving of code blocks
 " " Try to go into visual mode (v), thenselect several lines of code here and
@@ -58,56 +67,68 @@ vnoremap > >gv  " better indentation
 " " mkdir -p ~/.vim/colors && cd ~/.vim/colors
 " " wget -O wombat256mod.vim http://www.vim.org/scripts/download_script.php?src_id=13400
 set t_Co=256
-color wombat256mod
+"color wombat256mod
+colorscheme solarized
 
 " Highlight current line
 au WinLeave * set nocursorline nocursorcolumn
 au WinEnter * set cursorline cursorcolumn
 set cursorline cursorcolumn
 
+au BufNewFile,BufRead *.tsx set filetype=javascript.jsx
+if empty(glob('~/.vim/autoload/plug.vim'))
+      silent !curl -fLo ~/.vim/autoload/plug.vim --create-dirs
+          \ https://raw.githubusercontent.com/junegunn/vim-plug/master/plug.vim
+        autocmd VimEnter * PlugInstall --sync | source $MYVIMRC
+endif
 "set Vundle inital runtime path
-set rtp+=~/.vim/bundle/Vundle.vim
-call vundle#begin()
+call plug#begin('~/.vim/bundle')
+Plug 'scrooloose/nerdcommenter'
+let NERDSpaceDelims=1           " 让注释符与语句之间留一个空格
+let NERDCompactSexyComs=1       " 多行注释时样子更好看
+let g:NERDDefaultAlign = 'left'  "将行注释符左对齐
 
-" Set Vundle to manage Plugin version
-Plugin 'VundleVim/Vundle.vim'
+Plug 'vim-scripts/indentpython.vim'
 
-Plugin 'vim-scripts/indentpython.vim'
+Plug 'Valloric/YouCompleteMe',{'do':'./install.py --tern-completer'}
 
-Bundle 'Valloric/YouCompleteMe'
+Plug 'scrooloose/syntastic'
+Plug 'ervandew/supertab'
+Plug 'SirVer/ultisnips'
+Plug 'honza/vim-snippets'
 
-Plugin 'scrooloose/syntastic'
+Plug 'scrooloose/nerdtree'
 
-Plugin 'SirVer/ultisnips'
+Plug 'kien/ctrlp.vim'
+let g:ctrlp_custom_ignore='node_modules\|DS_Store\|git'
 
-Plugin 'honza/vim-snippets'
+Plug 'jnurmine/Zenburn'
 
-Plugin 'scrooloose/nerdtree'
+Plug 'godlygeek/tabular'
 
-Plugin 'kien/ctrlp.vim'
+Plug 'terryma/vim-multiple-cursors'
 
-Plugin 'jnurmine/Zenburn'
+Plug 'tpope/vim-surround'
 
-Plugin 'godlygeek/tabular'
+Plug 'altercation/vim-colors-solarized'
 
-Plugin 'terryma/vim-multiple-cursors'
-
-Plugin 'tpope/vim-surround'
-
-Plugin 'altercation/vim-colors-solarized'
-
-Plugin 'mattn/emmet-vim'
+Plug 'mattn/emmet-vim'
 " For git
-Plugin 'tpope/vim-fugitive'
+Plug 'tpope/vim-fugitive'
 
-Bundle 'bling/vim-airline'
+Plug 'bling/vim-airline'
 
-Bundle 'jiangmiao/auto-pairs'
+Plug 'jiangmiao/auto-pairs'
 
-Bundle 'tpope/vim-endwise'
-Bundle 'christoomey/vim-run-interactive'
+Plug 'tell-k/vim-autopep8'
+
+Plug 'tpope/vim-endwise'
+
+Plug 'christoomey/vim-run-interactive'
+
+Plug 'jmcomets/vim-pony'
 "安装tagbar插件  
-Bundle 'majutsushi/tagbar'  
+Plug 'majutsushi/tagbar'  
 ""设置tagbar使用的ctags的插件,必须要设置对  
 let g:tagbar_ctags_bin='/usr/local/Cellar/ctags/5.8_1/bin/ctags'  
 "设置tagbar的窗口宽度  
@@ -119,26 +140,52 @@ autocmd BufReadPost *.py,*.cpp,*.c,*.h,*.hpp,*.cc,*.cxx,*.rb call tagbar#autoope
 ""映射tagbar的快捷键  
 map <F8> :TagbarToggle<CR>  
 
-call vundle#end()
+
+Plug 'pangloss/vim-javascript'
+Plug 'mxw/vim-jsx'
+let g:jsx_ext_required=0
+Plug 'Valloric/MatchTagAlways'
+let g:mta_filetypes = {'javascript.jsx':1}
+Plug 'epilande/vim-es2015-snippets'
+Plug 'epilande/vim-react-snippets'
+call plug#end()
 
 " Settings for vim-powerline
 set laststatus=2
 
 nnoremap <silent> <F5> :NERDTree<CR>
 
-if has('gui_running')
-    set background=dark
-    colorscheme solarized
-else
-    colorscheme Zenburn
-endif
 let python_highlight_all=1
 
+let g:ycm_python_binary_path = 'python'
+" Start autocompletion after 4 chars
+let g:ycm_min_num_of_chars_for_completion = 4
+let g:ycm_min_num_identifier_candidate_chars = 4
+let g:ycm_enable_diagnostic_highlighting = 0
+" Don't show YCM's preview window [ I find it really annoying ]
+set completeopt-=preview
+let g:ycm_add_preview_to_completeopt = 0
+
+" make YCM compatible with UltiSnips (using supertab)
+ let g:ycm_key_list_select_completion = ['<tab>', '<Down>']
+ let g:ycm_key_list_previous_completion = ['<C-m>', '<Up>']
+ let g:SuperTabDefaultCompletionType = '<tab>'
+nnoremap <leader>gic    :YcmCompleter GoToInclude<CR>
+nnoremap <leader>gdc    :YcmCompleter GoToDeclaration<CR>
+nnoremap <leader>gdf    :YcmCompleter GoToDefinition<CR>
+nnoremap <leader>gip    :YcmCompleter GoToImprecise<CR>
+  
+  " better key bindings for UltiSnipsExpandTrigger
+  let g:UltiSnipsExpandTrigger="<c-e>"
+  let g:UltiSnipsJumpForwardTrigger="<c-j>"
+  let g:UltiSnipsJumpBackwardTrigger="<c-k>"
+  let g:UltiSnipsSnippetDirectories=["UltiSnips","mysnippets"]
 " vim-snippets Trigger configuration. Do not use <tab> if you use
 " https://github.com/Valloric/YouCompleteMe.
-let g:UltiSnipsExpandTrigger="<c-e>"
-let g:UltiSnipsJumpForwardTrigger="<c-b>"
-let g:UltiSnipsJumpBackwardTrigger="<c-z>"
+"let g:UltiSnipsExpandTrigger="<C-e>"
+"let g:UltiSnipsJumpForwardTrigger="<C-j>"
+"let g:UltiSnipsJumpBackwardTrigger="<C-h>"
+"let g:UltiSnipsSnippetDirectories=["UltiSnips","mysnippets"]
 
 
 "PEP8 space and tab for Python
@@ -146,7 +193,7 @@ au BufNewFile,BufRead *.py
 \ set tabstop=4 |
 \ set softtabstop=4 |
 \ set shiftwidth=4 |
-\ set textwidth=79 |
+"\ set textwidth=79 |
 \ set expandtab |
 \ set autoindent |
 \ set fileformat=unix
